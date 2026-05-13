@@ -3,8 +3,8 @@ name: Video Downloader
 on:
   workflow_dispatch:
     inputs:
-      youtube_url:
-        description: '🔗 YouTube video URL(s)'
+      url:
+        description: '🔗 Video video URL'
         required: true
         type: string
       quality:
@@ -132,28 +132,29 @@ jobs:
       - name: Download videos
         id: download
         run: |
-          # parse quality input
-          QUALITY="${{ inputs.quality }}"
+          set -euo pipefail
           
+          # ---- quality ----
+          QUALITY="${{ inputs.quality }}"
           if [ "$QUALITY" = "audio" ]; then
-            FORMAT_OPTS="-f bestaudio --extract-audio --audio-format mp3"
+              FORMAT_OPTS="-f ba -x --audio-format mp3"
           elif [ "$QUALITY" = "best" ]; then
-            FORMAT_OPTS="-f bestvideo+bestaudio/best --merge-output-format mp4"
+              FORMAT_OPTS="-f bv*+ba/b"
           else
-            FORMAT_OPTS="-f bestvideo[height<=${QUALITY}]+bestaudio/best[height<=${QUALITY}] --merge-output-format mp4"
+              FORMAT_OPTS="-f bv*[height<=${QUALITY}]+ba/b[height<=${QUALITY}]"
           fi
-
-          # parse output name
+          
+          # ---- output ----
+          OUTPUT_OPTS=""
           OUTPUT_NAME="${{ inputs.output_name }}"
           if [ -n "$OUTPUT_NAME" ]; then
-            OUTPUT_OPTS="-o ${OUTPUT_NAME}.%(ext)s"
-          else
-            OUTPUT_OPTS=""
+              OUTPUT_OPTS="-o ${OUTPUT_NAME}.%(ext)s"
           fi
           
-          # download using yt-dlp
+          # ---- download ----
           mkdir -p tmpvideos
           cd tmpvideos
+          
           yt-dlp --remote-components ejs:github --proxy socks5://127.0.0.1:1080 $FORMAT_OPTS $OUTPUT_OPTS "${{ inputs.youtube_url }}"
 
           # find name
@@ -161,12 +162,12 @@ jobs:
           FILE_NO_EXTENSION="${FILE%.*}"
           echo "FILE=$FILE" >> $GITHUB_ENV
           echo "FILE_NO_EXTENSION=$FILE_NO_EXTENSION" >> $GITHUB_ENV
-          SAFE_NAME=$(echo "$FILE" | sed 's/^[[:space:]]*//' | tr ' ' '_')
+          SAFE_NAME=$(echo "$FILE_NO_EXTENSION" | sed 's/^[[:space:]]*//' | tr ' ' '_')
           echo "SAFE_NAME=$SAFE_NAME" >> $GITHUB_ENV
-
+          
           # zip
-          zip -0 -s "${{ inputs.parts_size }}m" "../videos/\"${SAFE_NAME}.zip\"" "$FILE"
-          ls -la
+          mkdir -p ../videos
+          zip -r -0 -s "${{ inputs.parts_size }}m" "../videos/${SAFE_NAME}.zip" "."
           
       - name: Stop WARP
         if: ${{ inputs.use_warp }}
