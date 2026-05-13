@@ -132,7 +132,7 @@ jobs:
       - name: Download videos
         id: download
         run: |
-          # ---- quality ----
+          # quality
           QUALITY="${{ inputs.quality }}"
           if [ "$QUALITY" = "audio" ]; then
               FORMAT_OPTS="-f ba -x --audio-format mp3"
@@ -142,13 +142,13 @@ jobs:
               FORMAT_OPTS="-f bv*[height<=${QUALITY}]+ba/b[height<=${QUALITY}]"
           fi
           
-          # ---- output ----
+          # output
           OUTPUT_NAME="${{ inputs.output_name }}"
           if [ -n "$OUTPUT_NAME" ]; then
               OUTPUT_OPTS="-o ${OUTPUT_NAME}.%(ext)s"
           fi
           
-          # ---- download ----
+          # download
           mkdir -p tmpvideos
           cd tmpvideos
           
