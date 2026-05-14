@@ -28,7 +28,7 @@ on:
         required: false
         type: string
       branch_name:
-        description: 'ℹ️ Branch name (simultanous workflows cannot be on the same branch)'
+        description: 'ℹ️ Branch name (simultaneous workflows cannot be on the same branch)'
         required: true
         default: 'videos'
         type: string

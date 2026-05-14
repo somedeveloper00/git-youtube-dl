@@ -65,6 +65,10 @@ Click on this button in your repo's main page to access the list of branches:
 [Main repo page circling the branches page button](https://abrehamrahi.ir/o/public/8tQTYpkc/).  
 Then delete the branches you no longer need.
 
+#### 🎤 How do I use multiple workflows simultaneously?
+For simultaneous workflows of the same type (e.g. if both are Video), you can use the Branch Name option to use two different branches.   
+Simultaneous workflows on the same branch will result in falure of all but one workflows.
+
 #### 🎤 There's a bug, what should I do?
 This method is very much experimental and doesn't work for 100% of the cases. Create an Issue if you can.
 
